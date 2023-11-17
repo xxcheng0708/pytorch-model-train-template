@@ -1,0 +1,7 @@
+save_dir: "./results"
+device: [0, 1, 2, 3]
+batch_size: 128
+num_workers: 8
+epoch: 5
+weight_decay: 0.0005
+lr: 0.001
