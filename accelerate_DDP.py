@@ -14,7 +14,8 @@ from accelerate import Accelerator
 os.environ["TORCH_HOME"] = "./pretrained_models"
 
 accelerator = Accelerator(split_batches=True)
-local_rank = torch.distributed.get_rank()
+# global_rank = torch.distributed.get_rank()
+local_rank = int(os.environ["LOCAL_RANK"])
 print("local rank: {}, world size: {}".format(local_rank, torch.distributed.get_world_size()))
 device = accelerator.device
 

@@ -194,7 +194,15 @@ with torch.autocast(device_type="cuda"):
 
 [DISTRIBUTED COMMUNICATION PACKAGE - TORCH.DISTRIBUTED](https://pytorch.org/docs/stable/distributed.html)
 
-* 代码文件：pytorch_DDP.py
+[DISTRIBUTED DATA PARALLEL](https://pytorch.org/docs/stable/notes/ddp.html)
+
+[[原创][深度][PyTorch] DDP系列第一篇：入门教程](https://zhuanlan.zhihu.com/p/178402798)
+
+[[原创][深度][PyTorch] DDP系列第二篇：实现原理与源代码解析](https://zhuanlan.zhihu.com/p/187610959)
+
+[[原创][深度][PyTorch] DDP系列第三篇：实战与技巧](https://zhuanlan.zhihu.com/p/250471767)
+
+* 代码文件：pytorch_DDP.py  / pytorch_torchrun_DDP.py
 * 单卡显存占用：3.12 G
 * 单卡GPU使用率峰值：99%
 * 训练时长（5 epoch）：560 s
@@ -202,9 +210,14 @@ with torch.autocast(device_type="cuda"):
 
 ![](./results/pytorch_DDP.jpg)
 
-* 代码启动命令（单机 4 GPU）
+* 代码启动命令torch.distributed.launch（单机 4 GPU）
 ```
 python -m torch.distributed.launch --nproc_per_node=4 --nnodes=1 pytorch_DDP.py    
+```
+
+* 代码启动命令torchrun（单机 4 GPU）
+```
+torchrun --nproc_per_node=4 --nnodes=1 pytorch_torchrun_DDP.py    
 ```
 
 ---
@@ -265,7 +278,7 @@ accelerate launch --config_file ./config/default_DDP.yml accelerate_DDP.py
     * 单卡显存占用：2.88 G
     * 单卡GPU使用率峰值：99%
 
-* 代码文件：pytorch_FSDP.py
+* 代码文件：pytorch_FSDP.py / pytorch_torchrun_FSDP.py
 * 训练时长（5 epoch）：581 s
 * 训练结果：准确率85%左右
 
@@ -273,9 +286,14 @@ accelerate launch --config_file ./config/default_DDP.yml accelerate_DDP.py
 
 ![](./results/pytorch_FSDP.jpg)
 
-* 代码启动命令（单机 4 GPU）
+* 代码启动命令torch.distributed.launch（单机 4 GPU）
 ```
 python -m torch.distributed.launch --nproc_per_node=4 --nnodes=1 pytorch_FSDP.py    
+```
+
+* 代码启动命令torchrun（单机 4 GPU）
+```
+torchrun --nproc_per_node=4 --nnodes=1 pytorch_torchrun_FSDP.py    
 ```
 
 * FSDP包装后的模型

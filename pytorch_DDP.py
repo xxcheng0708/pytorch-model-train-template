@@ -33,7 +33,7 @@ torch.cuda.set_device(args.local_rank)
 device = torch.device("cuda", args.local_rank)
 torch.distributed.init_process_group(backend="nccl")
 world_size = torch.distributed.get_world_size()
-set_seed(42)
+set_seed(args.local_rank + 1)
 
 cfg_path = args.cfg
 with open(cfg_path, "r", encoding="utf8") as f:
@@ -108,6 +108,8 @@ for epoch in range(num_epoches):
     n = 0
     model.train()
 
+    # set_epoch是为了让不同的epoch采样出不同的样本顺序，同时，保证同一个人epoch下，各个进程之间的相同随机数种子
+    # 这样就可以根据rank编号和world_size使不同进程获取到不重复的数据
     cifar10_train_sampler.set_epoch(epoch)
 
     for batch_idx, (X, y) in enumerate(train_data_loader):

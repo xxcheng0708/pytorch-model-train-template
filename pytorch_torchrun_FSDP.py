@@ -27,7 +27,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--cfg", default="./config/classifier_cifar10.yaml", type=str, help="data file path")
-parser.add_argument("--local-rank", type=int, default=-1)
+# parser.add_argument("--local-rank", type=int, default=-1)
 args = parser.parse_args()
 
 
@@ -37,6 +37,7 @@ def set_seed(seed):
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
 
+args.local_rank = int(os.environ["LOCAL_RANK"])
 # print(args.local_rank)
 torch.cuda.set_device(args.local_rank)
 device = torch.device("cuda", args.local_rank)

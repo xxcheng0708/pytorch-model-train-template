@@ -1,5 +1,3 @@
-import sys
-
 import torch
 from torch.cuda import max_memory_allocated
 import torchvision
@@ -11,23 +9,15 @@ from matplotlib import pyplot as plt
 import os
 from transformers import get_cosine_schedule_with_warmup
 import time
-from torch.distributed.fsdp import (
-    FullyShardedDataParallel,
-    CPUOffload
-)
 import random
 import numpy as np
-from torch import nn
-from functools import partial
-from torch.distributed.fsdp.wrap import _module_wrap_policy
 from torch.utils.data.distributed import DistributedSampler
 
 os.environ["TORCH_HOME"] = "./pretrained_models"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3"
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--cfg", default="./config/classifier_cifar10.yaml", type=str, help="data file path")
-parser.add_argument("--local-rank", type=int, default=-1)
+# parser.add_argument("--local-rank", type=int, default=-1)
 args = parser.parse_args()
 
 
@@ -37,10 +27,12 @@ def set_seed(seed):
     torch.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
 
+
+args.local_rank = int(os.environ["LOCAL_RANK"])
 # print(args.local_rank)
 torch.cuda.set_device(args.local_rank)
 device = torch.device("cuda", args.local_rank)
-torch.distributed.init_process_group(backend="nccl", rank=args.local_rank)
+torch.distributed.init_process_group(backend="nccl")
 world_size = torch.distributed.get_world_size()
 set_seed(args.local_rank + 1)
 
@@ -77,31 +69,32 @@ val_transforms = torchvision.transforms.Compose(val_transforms_list)
 if args.local_rank not in [-1, 0]:
     torch.distributed.barrier()
 
-if args.local_rank == 0:
-    torch.distributed.barrier()
-
 cifar10_train = torchvision.datasets.CIFAR10(root="./data", train=True, transform=train_transforms, download=True)
 cifar10_test = torchvision.datasets.CIFAR10(root="./data", train=False, transform=val_transforms, download=True)
 
-cifar10_train_sampler = DistributedSampler(cifar10_train, shuffle=True, rank=args.local_rank, num_replicas=world_size, seed=0)
-cifar10_test_sampler = DistributedSampler(cifar10_test, shuffle=False, rank=args.local_rank, num_replicas=world_size, seed=0)
+if args.local_rank == 0:
+    torch.distributed.barrier()
 
-train_data_loader = DataLoader(cifar10_train, batch_size=batchsize // world_size, drop_last=True, shuffle=False,
-                               num_workers=num_workers, sampler=cifar10_train_sampler)
-test_data_loader = DataLoader(cifar10_test, batch_size=batchsize // world_size, drop_last=False, shuffle=False,
-                              num_workers=num_workers, sampler=cifar10_test_sampler)
+cifar10_train_sampler = DistributedSampler(cifar10_train, shuffle=True, rank=args.local_rank, num_replicas=world_size)
+cifar10_test_sampler = DistributedSampler(cifar10_test, shuffle=False, rank=args.local_rank, num_replicas=world_size)
+
+train_data_loader = DataLoader(cifar10_train, batch_size=batchsize // len(visible_device), drop_last=True,
+                               shuffle=False,
+                               num_workers=num_workers,
+                               sampler=cifar10_train_sampler)
+test_data_loader = DataLoader(cifar10_test, batch_size=batchsize // len(visible_device), drop_last=False,
+                              shuffle=False,
+                              num_workers=num_workers,
+                              sampler=cifar10_test_sampler)
 classes = cifar10_train.classes
 print("train: {}, test: {}, classes: {}".format(len(train_data_loader), len(test_data_loader), len(classes)))
 
-model = torchvision.models.resnet50(weights=torchvision.models.ResNet50_Weights.IMAGENET1K_V1)
-model = FullyShardedDataParallel(model, device_id=args.local_rank,
-                                 auto_wrap_policy=partial(_module_wrap_policy, module_classes=[nn.Conv2d, nn.Linear]))
+model = torchvision.models.resnet50(weights=torchvision.models.ResNet50_Weights.IMAGENET1K_V1).cuda()
+model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.local_rank], output_device=args.local_rank)
 optimizer = torch.optim.SGD(model.parameters(), lr=lr, weight_decay=weight_decay)
 loss = torch.nn.CrossEntropyLoss()
 lr_scheduler = get_cosine_schedule_with_warmup(optimizer, num_warmup_steps=10,
                                                num_training_steps=len(train_data_loader) * num_epoches)
-if args.local_rank == 0:
-    print(model)
 
 train_acc = []
 train_loss = []
@@ -116,6 +109,8 @@ for epoch in range(num_epoches):
     n = 0
     model.train()
 
+    # set_epoch是为了让不同的epoch采样出不同的样本顺序，同时，保证同一个人epoch下，各个进程之间的相同随机数种子
+    # 这样就可以根据rank编号和world_size使不同进程获取到不重复的数据
     cifar10_train_sampler.set_epoch(epoch)
 
     for batch_idx, (X, y) in enumerate(train_data_loader):
@@ -136,9 +131,6 @@ for epoch in range(num_epoches):
         train_acc_sum += (y_pred.argmax(dim=1) == y).sum().item()
         n += y.shape[0]
 
-        # if batch_idx > 100:
-        #     break
-
         batch_acc = (y_pred.argmax(dim=1) == y).float().mean()
         torch.distributed.all_reduce(batch_acc, op=torch.distributed.ReduceOp.AVG)
         torch.distributed.all_reduce(l, op=torch.distributed.ReduceOp.AVG)
@@ -151,7 +143,6 @@ for epoch in range(num_epoches):
         # torch.distributed.all_gather_into_tensor(y_pred_gather, y_pred)
         # print("X_gather: {}, y_gather: {}, y_pred_gather: {}".format(X_gather.shape, y_gather.shape,
         #                                                              y_pred_gather.shape))
-        # print((X_gather[:batchsize // 4, :, :, :] == X_gather[batchsize // 4: (batchsize // 4) * 2, :, :, :]).sum())
 
         if batch_idx % 20 == 0 and args.local_rank == 0:
             print("epoch: {}, iter: {}, iter loss: {:.4f}, iter acc: {:.4f}".format(epoch, batch_idx, l.item(),
@@ -159,8 +150,9 @@ for epoch in range(num_epoches):
         lr_scheduler.step()
 
     model.eval()
-    v_acc, v_loss = evaluate_accuracy_and_loss(test_data_loader, model, loss, accelerator=None,
-                                               local_rank=args.local_rank, world_size=world_size)
+    v_acc, v_loss = evaluate_accuracy_and_loss(test_data_loader, model, loss, accelerator=None, is_half=False,
+                                               local_rank=args.local_rank,
+                                               world_size=world_size)
     train_acc.append(train_acc_sum / n)
     train_loss.append(train_loss_sum / n)
     val_acc.append(v_acc)
@@ -190,7 +182,6 @@ if args.local_rank == 0:
     axes[2].plot(list(range(1, len(lr_decay_list) + 1)), lr_decay_list, color="r", label="lr")
     axes[2].legend()
     axes[2].set_title("Learning Rate")
-
     plt.suptitle('memory: {:.2f} G , duration: {} s'.format(memory / 1e9, duration))
     plt.savefig(os.path.join(save_dir, "{}.jpg".format(os.path.splitext(os.path.basename(__file__))[0])))
     plt.show()
