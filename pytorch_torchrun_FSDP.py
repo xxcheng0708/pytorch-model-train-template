@@ -110,6 +110,9 @@ val_acc = []
 val_loss = []
 lr_decay_list = []
 memory = 0
+file_name = os.path.splitext(os.path.basename(__file__))[0]
+best_acc = 0.0
+best_model = ""
 start_time = time.time()
 for epoch in range(num_epoches):
     train_loss_sum = 0.0
@@ -167,7 +170,18 @@ for epoch in range(num_epoches):
     val_acc.append(v_acc)
     val_loss.append(v_loss)
 
+    states = model.state_dict()
+    torch.distributed.barrier()
+    # Note: to save the FSDP model, we need to call the state_dict on each rank then on Rank 0 save the overall states.
     if args.local_rank == 0:
+        if v_acc > best_acc:
+            if os.path.exists(os.path.join(save_dir, file_name)) is False:
+                os.makedirs(os.path.join(save_dir, file_name))
+            best_acc = v_acc
+            best_model = os.path.join(os.path.join(save_dir, file_name),
+                                      "{}-{}-{}.pth".format(file_name, epoch, best_acc))
+            torch.save(states, best_model)
+
         print("epoch: {}, train acc: {:.4f}, train loss: {:.4f}, val acc: {:.4f}, val loss: {:.4f}".format(
             epoch, train_acc[-1], train_loss[-1], val_acc[-1], val_loss[-1]))
     memory = max_memory_allocated()
@@ -193,5 +207,5 @@ if args.local_rank == 0:
     axes[2].set_title("Learning Rate")
 
     plt.suptitle('memory: {:.2f} G , duration: {} s'.format(memory / 1e9, duration))
-    plt.savefig(os.path.join(save_dir, "{}.jpg".format(os.path.splitext(os.path.basename(__file__))[0])))
+    plt.savefig(os.path.join(save_dir, "{}.jpg".format(file_name)))
     plt.show()
