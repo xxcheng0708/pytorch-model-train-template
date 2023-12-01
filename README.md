@@ -1,5 +1,5 @@
 
-pytorch单精度、半精度、混合精度、单卡、多卡（DP / DDP）、FSDP、DeepSpeed模型训练代码，并对比不同方法的训练速度以及GPU内存的使用
+pytorch单精度、半精度、混合精度、单卡、多卡（DP / DDP）、FSDP、DeepSpeed模型训练、模型保存、模型推理、onnx导出、onnxruntime推理等示例代码，并对比不同方法的训练速度以及GPU内存的使用。
 
 ---
 
@@ -284,6 +284,14 @@ accelerate launch --config_file ./config/default_DDP.yml accelerate_DDP.py
 
 **备注：** pytorch里面的FSDP的batchsize是指单张卡上的batch大小
 
+**注意：** to save the FSDP model, we need to call the state_dict on each rank then on Rank 0 save the overall states.翻译过来就是使用下面形式的代码来保存FSDP模型（否则，保存模型的时候会卡主）：
+
+```
+states = model.state_dict()
+    if rank == 0:
+        torch.save(states, "model.pt")
+```
+
 ![](./results/pytorch_FSDP.jpg)
 
 * 代码启动命令torch.distributed.launch（单机 4 GPU）
@@ -390,6 +398,44 @@ deepspeed pytorch_DeepSpeed.py --deepspeed_config ./config/zero_stage2_config.js
 * 单卡GPU使用率峰值：
 * 训练时长（5 epoch）：
 * 训练结果：
+
+---
+
+### **模型保存**
+
+详见各方法的训练代码文件。
+
+* 单卡训练保存
+```
+torch.save(model.state_dict(), model_name)
+```
+
+* 多卡训练保存
+```
+torch.save(model.module.state_dict(), model_name)
+```
+
+* FSDP训练保存
+```
+states = model.state_dict()
+    if rank == 0:
+        torch.save(states, model_name)
+```
+
+---
+
+### **模型推理**
+
+详见model_inference.py代码文件
+
+---
+
+### **onnx模型导出 / onnxruntime推理**
+
+[pytorch.onnx.export方法参数详解，以及onnxruntime-gpu推理性能测试](https://blog.csdn.net/cxx654/article/details/123011332)
+
+详见model_inference.py代码文件
+
 
 <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 <script type="text/x-mathjax-config">

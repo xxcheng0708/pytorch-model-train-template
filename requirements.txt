@@ -1,0 +1,14 @@
+accelerate==0.24.0
+apex==0.9.10.dev0
+deepspeed==0.12.3
+fairscale==0.4.13
+matplotlib==3.5.1
+matplotlib-inline==0.1.6
+numpy==1.24.3
+opencv-python==4.7.0.72
+Pillow==9.5.0
+torch==2.0.1
+torchdata==0.6.1
+torchsummary==1.5.1
+torchtext==0.15.2
+torchvision==0.15.2

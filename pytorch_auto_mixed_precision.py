@@ -11,7 +11,7 @@ from transformers import get_cosine_schedule_with_warmup
 import time
 
 os.environ["TORCH_HOME"] = "./pretrained_models"
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--cfg", default="./config/classifier_cifar10.yaml", type=str, help="data file path")
@@ -71,6 +71,9 @@ val_acc = []
 val_loss = []
 lr_decay_list = []
 memory = 0
+file_name = os.path.splitext(os.path.basename(__file__))[0]
+best_acc = 0.0
+best_model = ""
 start_time = time.time()
 for epoch in range(num_epoches):
     train_loss_sum = 0.0
@@ -112,6 +115,14 @@ for epoch in range(num_epoches):
     val_acc.append(v_acc)
     val_loss.append(v_loss)
 
+    if v_acc > best_acc:
+        if os.path.exists(os.path.join(save_dir, file_name)) is False:
+            os.makedirs(os.path.join(save_dir, file_name))
+        best_acc = v_acc
+        best_model = os.path.join(os.path.join(save_dir, file_name),
+                                  "{}-{}-{}.pth".format(file_name, epoch, best_acc))
+        torch.save(model.state_dict(), best_model)
+
     print("epoch: {}, train acc: {:.4f}, train loss: {:.4f}, val acc: {:.4f}, val loss: {:.4f}".format(
         epoch, train_acc[-1], train_loss[-1], val_acc[-1], val_loss[-1]))
     memory = max_memory_allocated()
@@ -135,5 +146,5 @@ axes[2].plot(list(range(1, len(lr_decay_list) + 1)), lr_decay_list, color="r", l
 axes[2].legend()
 axes[2].set_title("Learning Rate")
 plt.suptitle('memory: {:.2f} G , duration: {} s'.format(memory / 1e9, duration))
-plt.savefig(os.path.join(save_dir, "{}.jpg".format(os.path.splitext(os.path.basename(__file__))[0])))
+plt.savefig(os.path.join(save_dir, "{}.jpg".format(file_name)))
 plt.show()

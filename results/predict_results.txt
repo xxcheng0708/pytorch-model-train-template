@@ -1,0 +1,150 @@
+######################################## results/pytorch_SingleGPU/pytorch_SingleGPU-4-0.8502.pth ########################################
+true label: cat, pred label: cat, probability: 0.49531105160713196
+true label: ship, pred label: ship, probability: 0.9953708052635193
+true label: ship, pred label: ship, probability: 0.6290735006332397
+true label: airplane, pred label: ship, probability: 0.8776712417602539
+true label: frog, pred label: frog, probability: 0.9999092817306519
+true label: frog, pred label: frog, probability: 0.9781796932220459
+true label: automobile, pred label: automobile, probability: 0.9969406127929688
+true label: frog, pred label: frog, probability: 0.9428491592407227
+true label: cat, pred label: cat, probability: 0.9847661256790161
+true label: automobile, pred label: automobile, probability: 0.49238982796669006
+true label: airplane, pred label: airplane, probability: 0.9644583463668823
+true label: truck, pred label: truck, probability: 0.9987174272537231
+FPS: 6.020674997942936
+time: 1.993132
+######################################## results/pytorch_half_precision/pytorch_half_precision-3-0.7657.pth ########################################
+true label: cat, pred label: dog, probability: 0.411376953125
+true label: ship, pred label: ship, probability: 0.97509765625
+true label: ship, pred label: ship, probability: 0.95947265625
+true label: airplane, pred label: ship, probability: 0.75732421875
+true label: frog, pred label: frog, probability: 0.986328125
+true label: frog, pred label: frog, probability: 0.78857421875
+true label: automobile, pred label: automobile, probability: 0.9921875
+true label: frog, pred label: frog, probability: 0.85400390625
+true label: cat, pred label: cat, probability: 0.7763671875
+true label: automobile, pred label: automobile, probability: 0.81103515625
+true label: airplane, pred label: airplane, probability: 0.935546875
+true label: truck, pred label: truck, probability: 0.9970703125
+FPS: 20.37022891044738
+time: 0.589095
+######################################## results/pytorch_auto_mixed_precision/pytorch_auto_mixed_precision-4-0.8527.pth ########################################
+true label: cat, pred label: cat, probability: 0.7998046875
+true label: ship, pred label: ship, probability: 0.9951171875
+true label: ship, pred label: ship, probability: 0.85986328125
+true label: airplane, pred label: airplane, probability: 0.85009765625
+true label: frog, pred label: frog, probability: 1.0
+true label: frog, pred label: frog, probability: 0.99072265625
+true label: automobile, pred label: automobile, probability: 0.9970703125
+true label: frog, pred label: frog, probability: 0.97412109375
+true label: cat, pred label: cat, probability: 0.994140625
+true label: automobile, pred label: automobile, probability: 0.8046875
+true label: airplane, pred label: airplane, probability: 0.98974609375
+true label: truck, pred label: truck, probability: 0.99951171875
+FPS: 20.349157629662287
+time: 0.589705
+######################################## results/pytorch_DP/pytorch_DP-4-0.853.pth ########################################
+true label: cat, pred label: cat, probability: 0.481297105550766
+true label: ship, pred label: ship, probability: 0.9981531500816345
+true label: ship, pred label: ship, probability: 0.8422554135322571
+true label: airplane, pred label: airplane, probability: 0.6468599438667297
+true label: frog, pred label: frog, probability: 0.9981891512870789
+true label: frog, pred label: frog, probability: 0.7812677025794983
+true label: automobile, pred label: automobile, probability: 0.9896262884140015
+true label: frog, pred label: frog, probability: 0.9684059023857117
+true label: cat, pred label: cat, probability: 0.9830524921417236
+true label: automobile, pred label: automobile, probability: 0.9368442893028259
+true label: airplane, pred label: airplane, probability: 0.976348340511322
+true label: truck, pred label: truck, probability: 0.998953104019165
+FPS: 22.300853379322646
+time: 0.538096
+######################################## results/pytorch_DDP/pytorch_DDP-4-0.8498.pth ########################################
+true label: cat, pred label: cat, probability: 0.5620244145393372
+true label: ship, pred label: ship, probability: 0.999433696269989
+true label: ship, pred label: ship, probability: 0.9801478385925293
+true label: airplane, pred label: ship, probability: 0.8680137395858765
+true label: frog, pred label: frog, probability: 0.9996864795684814
+true label: frog, pred label: frog, probability: 0.9637039303779602
+true label: automobile, pred label: automobile, probability: 0.9913962483406067
+true label: frog, pred label: frog, probability: 0.9695718884468079
+true label: cat, pred label: cat, probability: 0.956231951713562
+true label: automobile, pred label: automobile, probability: 0.8025721907615662
+true label: airplane, pred label: airplane, probability: 0.9704293608665466
+true label: truck, pred label: truck, probability: 0.9996167421340942
+FPS: 22.32986041976416
+time: 0.537397
+######################################## results/pytorch_torchrun_DDP/pytorch_torchrun_DDP-4-0.8535.pth ########################################
+true label: cat, pred label: cat, probability: 0.6225113868713379
+true label: ship, pred label: ship, probability: 0.9920348525047302
+true label: ship, pred label: ship, probability: 0.9630438685417175
+true label: airplane, pred label: airplane, probability: 0.7317190766334534
+true label: frog, pred label: frog, probability: 0.9995711445808411
+true label: frog, pred label: frog, probability: 0.948517382144928
+true label: automobile, pred label: automobile, probability: 0.9956387877464294
+true label: frog, pred label: frog, probability: 0.9135420322418213
+true label: cat, pred label: cat, probability: 0.9719404578208923
+true label: automobile, pred label: automobile, probability: 0.6018552184104919
+true label: airplane, pred label: airplane, probability: 0.8623990416526794
+true label: truck, pred label: truck, probability: 0.9800108671188354
+FPS: 22.098511481097486
+time: 0.543023
+######################################## results/accelerate_DDP/accelerate_DDP-4-0.8429588607594937.pth ########################################
+true label: cat, pred label: cat, probability: 0.6913860440254211
+true label: ship, pred label: ship, probability: 0.9985520243644714
+true label: ship, pred label: ship, probability: 0.9587045311927795
+true label: airplane, pred label: ship, probability: 0.5550355911254883
+true label: frog, pred label: frog, probability: 0.9996659755706787
+true label: frog, pred label: frog, probability: 0.9916366934776306
+true label: automobile, pred label: automobile, probability: 0.9966601133346558
+true label: frog, pred label: frog, probability: 0.6153024435043335
+true label: cat, pred label: cat, probability: 0.9930135607719421
+true label: automobile, pred label: automobile, probability: 0.7523941397666931
+true label: airplane, pred label: airplane, probability: 0.9949210286140442
+true label: truck, pred label: truck, probability: 0.9996640682220459
+FPS: 22.720000605866684
+time: 0.528169
+######################################## results/pytorch_FSDP/pytorch_FSDP-4-0.854.pth ########################################
+true label: cat, pred label: cat, probability: 0.8529624938964844
+true label: ship, pred label: ship, probability: 0.982895016670227
+true label: ship, pred label: ship, probability: 0.9148629307746887
+true label: airplane, pred label: airplane, probability: 0.7933085560798645
+true label: frog, pred label: frog, probability: 0.9988695979118347
+true label: frog, pred label: frog, probability: 0.9901548624038696
+true label: automobile, pred label: automobile, probability: 0.9850817918777466
+true label: frog, pred label: frog, probability: 0.9726275205612183
+true label: cat, pred label: cat, probability: 0.9626619219779968
+true label: automobile, pred label: automobile, probability: 0.7796186804771423
+true label: airplane, pred label: airplane, probability: 0.9870107173919678
+true label: truck, pred label: truck, probability: 0.99920254945755
+FPS: 22.145778276467894
+time: 0.541864
+######################################## results/pytorch_torchrun_FSDP/pytorch_torchrun_FSDP-3-0.8445.pth ########################################
+true label: cat, pred label: cat, probability: 0.7391637563705444
+true label: ship, pred label: ship, probability: 0.9922167062759399
+true label: ship, pred label: ship, probability: 0.9259632229804993
+true label: airplane, pred label: ship, probability: 0.5782352685928345
+true label: frog, pred label: frog, probability: 0.9997007846832275
+true label: frog, pred label: frog, probability: 0.9781292676925659
+true label: automobile, pred label: automobile, probability: 0.9840444326400757
+true label: frog, pred label: frog, probability: 0.9648783802986145
+true label: cat, pred label: cat, probability: 0.9578006863594055
+true label: automobile, pred label: automobile, probability: 0.6724308729171753
+true label: airplane, pred label: airplane, probability: 0.9483075141906738
+true label: truck, pred label: truck, probability: 0.9987634420394897
+FPS: 23.542706469535734
+time: 0.509712
+######################################## results/accelerate_FSDP/accelerate_FSDP-4-0.8551226265822784.pth ########################################
+true label: cat, pred label: cat, probability: 0.44309625029563904
+true label: ship, pred label: ship, probability: 0.9952545166015625
+true label: ship, pred label: ship, probability: 0.877112090587616
+true label: airplane, pred label: airplane, probability: 0.9232048988342285
+true label: frog, pred label: frog, probability: 0.9995554089546204
+true label: frog, pred label: frog, probability: 0.9112474918365479
+true label: automobile, pred label: automobile, probability: 0.9982779026031494
+true label: frog, pred label: frog, probability: 0.7322847843170166
+true label: cat, pred label: cat, probability: 0.9884873628616333
+true label: automobile, pred label: automobile, probability: 0.6766542196273804
+true label: airplane, pred label: airplane, probability: 0.9887362122535706
+true label: truck, pred label: truck, probability: 0.9983692765235901
+FPS: 23.176582381162074
+time: 0.517764
